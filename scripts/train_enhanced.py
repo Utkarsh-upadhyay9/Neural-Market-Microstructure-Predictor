@@ -38,34 +38,34 @@ def main():
     
     if args.quick:
         args.epochs = 10
-        logger.info("🚀 Quick training mode: 10 epochs")
+        logger.info(" Quick training mode: 10 epochs")
     
     # Setup logging
     setup_logging()
     
-    logger.info("🧠 Enhanced Neural Market Predictor Training")
+    logger.info(" Enhanced Neural Market Predictor Training")
     logger.info("=" * 60)
-    logger.info(f"👤 User: Utkarsh-upadhyay9")
-    logger.info(f"📅 Time: {datetime.now()}")
+    logger.info(f" User: Utkarsh-upadhyay9")
+    logger.info(f" Time: {datetime.now()}")
     logger.info(f"🤖 Models: {args.models}")
-    logger.info(f"📈 Symbols: {args.symbols}")
-    logger.info(f"⚡ Epochs: {args.epochs}")
+    logger.info(f" Symbols: {args.symbols}")
+    logger.info(f" Epochs: {args.epochs}")
     
     try:
         # Load training data
-        logger.info("\n📊 Loading training data...")
+        logger.info("\n Loading training data...")
         collector = DataCollector()
         all_data = []
         
         for symbol in args.symbols:
-            logger.info(f"  📈 Loading {symbol}...")
+            logger.info(f"   Loading {symbol}...")
             data = collector.get_yahoo_data(symbol, period="2y")
             
             if not data.empty:
                 all_data.append(data)
-                logger.info(f"    ✅ {len(data)} records")
+                logger.info(f"     {len(data)} records")
             else:
-                logger.warning(f"    ⚠️  No data for {symbol}")
+                logger.warning(f"    ⚠  No data for {symbol}")
             
             time.sleep(0.5)  # Be nice to the API
         
@@ -74,7 +74,7 @@ def main():
             return 1
         
         training_data = pd.concat(all_data, ignore_index=True)
-        logger.info(f"✅ Combined dataset: {len(training_data)} records")
+        logger.info(f" Combined dataset: {len(training_data)} records")
         
         # Initialize trainer
         trainer = ModelTrainer()
@@ -86,7 +86,7 @@ def main():
         results = {'models': {}}
         
         for model_name in args.models:
-            logger.info(f"\n🚀 Training {model_name.upper()} model...")
+            logger.info(f"\n Training {model_name.upper()} model...")
             logger.info("-" * 40)
             
             start_time = time.time()
@@ -111,18 +111,18 @@ def main():
                 results['models'][model_name] = result
                 
                 metrics = result['metrics']
-                logger.info(f"✅ {model_name.upper()} completed in {training_time:.1f}s")
-                logger.info(f"   📈 RMSE: {metrics.get('rmse', 0):.2f}")
-                logger.info(f"   📊 MAE: {metrics.get('mae', 0):.2f}")
-                logger.info(f"   🎯 Direction Accuracy: {metrics.get('directional_accuracy', 0):.1f}%")
+                logger.info(f" {model_name.upper()} completed in {training_time:.1f}s")
+                logger.info(f"    RMSE: {metrics.get('rmse', 0):.2f}")
+                logger.info(f"    MAE: {metrics.get('mae', 0):.2f}")
+                logger.info(f"    Direction Accuracy: {metrics.get('directional_accuracy', 0):.1f}%")
             else:
-                logger.error(f"❌ {model_name.upper()} training failed")
+                logger.error(f" {model_name.upper()} training failed")
         
         # Final summary
         if results['models']:
-            logger.info("\n🎉 TRAINING COMPLETE!")
+            logger.info("\n TRAINING COMPLETE!")
             logger.info("=" * 60)
-            logger.info("📊 FINAL RESULTS:")
+            logger.info(" FINAL RESULTS:")
             
             best_model = None
             best_rmse = float('inf')
@@ -142,7 +142,7 @@ def main():
             if best_model:
                 logger.info(f"\n🏆 Best performing model: {best_model.upper()}")
             
-            logger.info(f"\n📁 Model files saved in: models/")
+            logger.info(f"\n Model files saved in: models/")
             logger.info(f"💡 Ready for predictions! Run:")
             logger.info(f"   python run_predictions.py --models {' '.join(results['models'].keys())}")
             
@@ -152,7 +152,7 @@ def main():
             return 1
             
     except KeyboardInterrupt:
-        logger.info("\n⚠️  Training interrupted by user")
+        logger.info("\n⚠  Training interrupted by user")
         return 1
     except Exception as e:
         logger.error(f"Training error: {e}")

@@ -34,7 +34,7 @@ def load_saved_scaler_and_features():
 def prepare_prediction_data_simple(symbol: str, sequence_length: int = 60):
     """Simplified data preparation that matches training."""
     try:
-        logger.info(f"📊 Preparing data for {symbol}")
+        logger.info(f" Preparing data for {symbol}")
         
         # Get more data to ensure we have enough after processing
         collector = DataCollector()
@@ -71,7 +71,7 @@ def prepare_prediction_data_simple(symbol: str, sequence_length: int = 60):
         features = data.values
         latest_sequence = features[-sequence_length:].reshape(1, sequence_length, len(feature_columns))
         
-        logger.info(f"✅ Created sequence: {latest_sequence.shape}")
+        logger.info(f" Created sequence: {latest_sequence.shape}")
         return latest_sequence, data['close'].iloc[-1]  # Return sequence and current price
         
     except Exception as e:
@@ -99,9 +99,9 @@ def make_simple_predictions(symbols: list, models: list):
             if os.path.exists(model_path):
                 model = tf.keras.models.load_model(model_path, compile=False)
                 loaded_models[model_name] = model
-                logger.info(f"✅ Loaded {model_name} model")
+                logger.info(f" Loaded {model_name} model")
             else:
-                logger.warning(f"⚠️  Model not found: {model_path}")
+                logger.warning(f"⚠  Model not found: {model_path}")
         except Exception as e:
             logger.error(f"Error loading {model_name}: {e}")
     
@@ -111,7 +111,7 @@ def make_simple_predictions(symbols: list, models: list):
     
     # Make predictions for each symbol
     for symbol in symbols:
-        logger.info(f"\n📈 Predicting {symbol}...")
+        logger.info(f"\n Predicting {symbol}...")
         
         # Prepare data
         pred_data = prepare_prediction_data_simple(symbol)
@@ -171,7 +171,7 @@ def make_simple_predictions(symbols: list, models: list):
                 'confidence': 75.0  # Simplified confidence
             }
             
-            logger.info(f"  🎯 ENSEMBLE: ${ensemble_price:.2f} ({ensemble_change_pct:+.2f}%)")
+            logger.info(f"   ENSEMBLE: ${ensemble_price:.2f} ({ensemble_change_pct:+.2f}%)")
         
         results['symbols'][symbol] = symbol_results
     
@@ -184,7 +184,7 @@ def display_results(results):
         logger.error("No predictions to display")
         return
     
-    logger.info("\n📊 PREDICTION RESULTS")
+    logger.info("\n PREDICTION RESULTS")
     logger.info("=" * 60)
     
     # Create summary table
@@ -199,7 +199,7 @@ def display_results(results):
         else:
             continue
         
-        direction_icon = "📈" if ensemble['direction'] == "UP" else "📉"
+        direction_icon = "" if ensemble['direction'] == "UP" else "📉"
         
         summary_data.append({
             'Symbol': symbol,
@@ -221,7 +221,7 @@ def display_results(results):
         import json
         with open(filename, 'w') as f:
             json.dump(results, f, indent=2, default=str)
-        logger.info(f"💾 Results saved to {filename}")
+        logger.info(f" Results saved to {filename}")
     except Exception as e:
         logger.error(f"Error saving results: {e}")
 
@@ -244,9 +244,9 @@ def main():
     
     logger.info("🔮 Simple Neural Market Predictor")
     logger.info("=" * 50)
-    logger.info(f"👤 User: Utkarsh-upadhyay9")
-    logger.info(f"📅 Time: {datetime.now()}")
-    logger.info(f"📈 Symbols: {args.symbols}")
+    logger.info(f" User: Utkarsh-upadhyay9")
+    logger.info(f" Time: {datetime.now()}")
+    logger.info(f" Symbols: {args.symbols}")
     logger.info(f"🤖 Models: {args.models}")
     
     try:
@@ -256,11 +256,11 @@ def main():
         # Display results
         display_results(results)
         
-        logger.info("\n🎉 Predictions completed!")
+        logger.info("\n Predictions completed!")
         return 0
         
     except KeyboardInterrupt:
-        logger.info("\n⚠️  Interrupted by user")
+        logger.info("\n⚠  Interrupted by user")
         return 1
     except Exception as e:
         logger.error(f"Error: {e}")

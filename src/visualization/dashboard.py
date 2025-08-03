@@ -21,7 +21,7 @@ from utils import setup_logging
 # Configure Streamlit page
 st.set_page_config(
     page_title="Neural Market Predictor",
-    page_icon="📈",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -56,11 +56,11 @@ def main():
     """Main dashboard function."""
     
     # Header
-    st.markdown('<h1 class="main-header">🧠 Neural Market Microstructure Predictor</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; color: #666;">👤 User: Utkarsh-upadhyay9 | 📅 Built: August 2025</p>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header"> Neural Market Microstructure Predictor</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; color: #666;"> User: Utkarsh-upadhyay9 |  Built: August 2025</p>', unsafe_allow_html=True)
     
     # Sidebar
-    st.sidebar.title("🎛️ Control Panel")
+    st.sidebar.title("🎛 Control Panel")
     
     # Model selection
     available_models = ['lstm', 'cnn', 'attention']
@@ -73,7 +73,7 @@ def main():
     # Symbol selection
     default_symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA']
     selected_symbols = st.sidebar.multiselect(
-        "📈 Select Symbols", 
+        " Select Symbols", 
         default_symbols + ['META', 'NFLX', 'ORCL', 'CRM'],
         default=default_symbols[:3]
     )
@@ -82,13 +82,13 @@ def main():
     predict_button = st.sidebar.button("🔮 Generate Predictions", type="primary")
     
     # Auto-refresh option
-    auto_refresh = st.sidebar.checkbox("🔄 Auto-refresh (every 5 min)")
+    auto_refresh = st.sidebar.checkbox(" Auto-refresh (every 5 min)")
     if auto_refresh:
         st.rerun()
     
     # Main content
     if predict_button and selected_symbols and selected_models:
-        with st.spinner("🔄 Loading models and generating predictions..."):
+        with st.spinner(" Loading models and generating predictions..."):
             try:
                 # Initialize predictor
                 predictor = MarketPredictor()
@@ -101,18 +101,18 @@ def main():
                     if predictions.get('symbols'):
                         display_predictions(predictions, selected_models)
                     else:
-                        st.error("❌ No predictions generated")
+                        st.error(" No predictions generated")
                 else:
-                    st.error("❌ Failed to load models. Please ensure models are trained first.")
+                    st.error(" Failed to load models. Please ensure models are trained first.")
                     st.info("💡 Run: `python scripts/train_enhanced.py --models lstm`")
                     
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
+                st.error(f" Error: {str(e)}")
     
     elif not selected_symbols:
-        st.warning("⚠️ Please select at least one symbol")
+        st.warning("⚠ Please select at least one symbol")
     elif not selected_models:
-        st.warning("⚠️ Please select at least one model")
+        st.warning("⚠ Please select at least one model")
     else:
         # Show sample data and model info
         show_model_info()
@@ -122,7 +122,7 @@ def display_predictions(predictions, selected_models):
     """Display prediction results."""
     
     # Summary metrics
-    st.subheader("📊 Prediction Summary")
+    st.subheader(" Prediction Summary")
     
     # Create summary DataFrame
     summary_data = []
@@ -147,7 +147,7 @@ def display_predictions(predictions, selected_models):
         for i, row in df.iterrows():
             with cols[i]:
                 direction_color = "success-text" if row['Change %'] > 0 else "danger-text"
-                direction_icon = "📈" if row['Change %'] > 0 else "📉"
+                direction_icon = "" if row['Change %'] > 0 else "📉"
                 
                 st.markdown(f"""
                 <div class="metric-card">
@@ -169,7 +169,7 @@ def display_predictions(predictions, selected_models):
             create_model_comparison_chart(predictions, selected_models)
         
         # Price movement visualization
-        st.subheader("📈 Price Movement Visualization")
+        st.subheader(" Price Movement Visualization")
         create_price_visualization(df)
         
         # Download option
@@ -245,7 +245,7 @@ def show_model_info():
     
     with col1:
         st.markdown("""
-        **🧠 LSTM Model**
+        ** LSTM Model**
         - Best performer (RMSE: 192.77)
         - Great for sequential patterns
         - Directional accuracy: 50.9%
@@ -261,7 +261,7 @@ def show_model_info():
     
     with col3:
         st.markdown("""
-        **🎯 Attention Model**
+        ** Attention Model**
         - Focus on important periods
         - RMSE: 254.00  
         - Directional accuracy: 49.1%
@@ -269,7 +269,7 @@ def show_model_info():
 
 def show_sample_data():
     """Show sample market data."""
-    st.subheader("📊 Sample Market Data")
+    st.subheader(" Sample Market Data")
     
     try:
         collector = DataCollector()

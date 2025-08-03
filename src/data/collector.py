@@ -249,9 +249,9 @@ class DataCollector:
             
             if not data.empty:
                 data_dict[symbol] = data
-                logger.info(f"✅ Collected {len(data)} records for {symbol}")
+                logger.info(f" Collected {len(data)} records for {symbol}")
             else:
-                logger.warning(f"❌ No data collected for {symbol}")
+                logger.warning(f" No data collected for {symbol}")
             
             # Rate limiting
             if source == "alpha_vantage":

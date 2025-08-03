@@ -114,16 +114,16 @@ def validate_prediction(predicted_price, current_price, model_name, symbol):
     
     # Check for obviously wrong predictions
     if abs(change_pct) > max_change or predicted_price < 0:
-        logger.warning(f"⚠️  {model_name} prediction for {symbol} seems unrealistic: ${predicted_price:.2f} ({change_pct:+.2f}%)")
+        logger.warning(f"⚠  {model_name} prediction for {symbol} seems unrealistic: ${predicted_price:.2f} ({change_pct:+.2f}%)")
         
         # Adjust to reasonable range
         if predicted_price > max_price:
             adjusted_price = max_price
-            logger.info(f"🔧 Adjusted {model_name} prediction to ${adjusted_price:.2f}")
+            logger.info(f" Adjusted {model_name} prediction to ${adjusted_price:.2f}")
             return adjusted_price
         elif predicted_price < min_price:
             adjusted_price = min_price
-            logger.info(f"🔧 Adjusted {model_name} prediction to ${adjusted_price:.2f}")
+            logger.info(f" Adjusted {model_name} prediction to ${adjusted_price:.2f}")
             return adjusted_price
     
     return predicted_price
@@ -132,7 +132,7 @@ def validate_prediction(predicted_price, current_price, model_name, symbol):
 def get_stock_data_exact_38(symbol, period="2y"):
     """Get stock data with exactly 38 features."""
     try:
-        logger.info(f"📊 Getting data for {symbol}...")
+        logger.info(f" Getting data for {symbol}...")
         
         ticker = yf.Ticker(symbol)
         data = ticker.history(period=period)
@@ -177,13 +177,13 @@ def create_sequence_exact(data, sequence_length=60):
     features = data.values
     sequence = features[-sequence_length:].reshape(1, sequence_length, data.shape[1])
     
-    logger.info(f"✅ Created sequence shape: {sequence.shape}")
+    logger.info(f" Created sequence shape: {sequence.shape}")
     return sequence
 
 
 def load_and_predict_validated(symbol, models):
     """Load models and make validated predictions."""
-    logger.info(f"📈 Predicting {symbol}...")
+    logger.info(f" Predicting {symbol}...")
     
     # Get data with exactly 38 features
     data, current_price = get_stock_data_exact_38(symbol)
@@ -217,11 +217,11 @@ def load_and_predict_validated(symbol, models):
                     try:
                         if model_name == 'attention':
                             # Skip attention model for now due to loading issues
-                            logger.warning(f"⚠️  Skipping {model_name} due to loading issues")
+                            logger.warning(f"⚠  Skipping {model_name} due to loading issues")
                             break
                         
                         model = tf.keras.models.load_model(path, compile=False)
-                        logger.info(f"✅ Loaded {model_name} from {path}")
+                        logger.info(f" Loaded {model_name} from {path}")
                         
                         # Verify shape compatibility
                         expected = model.input_shape
@@ -229,9 +229,9 @@ def load_and_predict_validated(symbol, models):
                         logger.info(f"🔍 Model expects: {expected}, We provide: {actual}")
                         
                         if expected[1:] == actual[1:]:
-                            logger.info(f"✅ Shape match for {model_name}")
+                            logger.info(f" Shape match for {model_name}")
                         else:
-                            logger.warning(f"⚠️  Shape mismatch for {model_name}")
+                            logger.warning(f"⚠  Shape mismatch for {model_name}")
                             model = None
                         
                         break
@@ -268,8 +268,8 @@ def load_and_predict_validated(symbol, models):
             if abs(change_pct) <= 20:  # Only predictions within ±20%
                 valid_predictions[model_name] = prediction_data
             
-            direction_icon = "📈" if change > 0 else "📉"
-            confidence = "🔥" if abs(change_pct) > 2 else "📊"
+            direction_icon = "" if change > 0 else "📉"
+            confidence = "" if abs(change_pct) > 2 else ""
             
             logger.info(f"  {confidence} {model_name.upper()}: ${predicted_price:.2f} ({change_pct:+.2f}%) {direction_icon}")
             
@@ -277,7 +277,7 @@ def load_and_predict_validated(symbol, models):
                 logger.info(f"    (Raw prediction was: ${raw_predicted_price:.2f})")
             
         except Exception as e:
-            logger.error(f"❌ Error with {model_name}: {e}")
+            logger.error(f" Error with {model_name}: {e}")
     
     if valid_predictions:
         # Calculate ensemble from valid predictions only
@@ -294,9 +294,9 @@ def load_and_predict_validated(symbol, models):
                 'models_used': list(valid_predictions.keys())
             }
             
-            direction_icon = "📈" if avg_change > 0 else "📉"
+            direction_icon = "" if avg_change > 0 else "📉"
             
-            logger.info(f"  🎯 ENSEMBLE ({len(valid_predictions)} models): ${avg_price:.2f} ({avg_change_pct:+.2f}%) {direction_icon}")
+            logger.info(f"   ENSEMBLE ({len(valid_predictions)} models): ${avg_price:.2f} ({avg_change_pct:+.2f}%) {direction_icon}")
         
         return {
             'symbol': symbol,
@@ -319,13 +319,13 @@ def main():
     
     args = parser.parse_args()
     
-    logger.info("🧠 Neural Market Predictor - Validated Predictions")
+    logger.info(" Neural Market Predictor - Validated Predictions")
     logger.info("=" * 60)
-    logger.info(f"👤 User: Utkarsh-upadhyay9")
-    logger.info(f"📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
-    logger.info(f"📈 Symbols: {args.symbols}")
+    logger.info(f" User: Utkarsh-upadhyay9")
+    logger.info(f" Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
+    logger.info(f" Symbols: {args.symbols}")
     logger.info(f"🤖 Models: {args.models}")
-    logger.info(f"🎯 Features: Exactly 38 with validation")
+    logger.info(f" Features: Exactly 38 with validation")
     
     results = []
     
@@ -336,7 +336,7 @@ def main():
     
     # Summary
     if args.summary and results:
-        logger.info("\n📊 VALIDATED PREDICTION SUMMARY")
+        logger.info("\n VALIDATED PREDICTION SUMMARY")
         logger.info("=" * 60)
         
         for result in results:
@@ -353,17 +353,17 @@ def main():
             else:
                 continue
             
-            direction_icon = "📈" if pred['direction'] == 'UP' else "📉"
-            confidence = "🔥" if abs(pred['change_pct']) > 2 else "📊"
+            direction_icon = "" if pred['direction'] == 'UP' else "📉"
+            confidence = "" if abs(pred['change_pct']) > 2 else ""
             
             logger.info(f"{direction_icon} {symbol} ({method}): ${current:.2f} → ${pred['predicted_price']:.2f} "
                        f"({pred['change_pct']:+.2f}%) {confidence}")
     
     if results:
-        logger.info(f"\n🎉 Successfully generated validated predictions for {len(results)}/{len(args.symbols)} symbols")
+        logger.info(f"\n Successfully generated validated predictions for {len(results)}/{len(args.symbols)} symbols")
         return 0
     else:
-        logger.error("❌ No valid predictions generated")
+        logger.error(" No valid predictions generated")
         return 1
 
 

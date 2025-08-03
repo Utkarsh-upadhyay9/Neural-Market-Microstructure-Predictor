@@ -27,7 +27,7 @@ class ExtremePreprocessor:
     def add_massive_technical_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Add 200+ technical indicators."""
         try:
-            logger.info("🔥 Adding MASSIVE technical indicators (200+ features)...")
+            logger.info(" Adding MASSIVE technical indicators (200+ features)...")
             df = data.copy()
             
             # Ensure correct columns
@@ -69,7 +69,7 @@ class ExtremePreprocessor:
             # Market structure features (10+ features)
             df = self._add_market_structure_features(df)
             
-            logger.info(f"💪 Added massive indicators: {len(df.columns)} total features")
+            logger.info(f" Added massive indicators: {len(df.columns)} total features")
             return df
             
         except Exception as e:
@@ -235,7 +235,7 @@ class ExtremePreprocessor:
     
     def create_extreme_dataset(self, symbols: List[str], years: int = 10) -> pd.DataFrame:
         """Create extremely comprehensive dataset."""
-        logger.info(f"🔥 Creating EXTREME dataset for {len(symbols)} symbols ({years} years)")
+        logger.info(f" Creating EXTREME dataset for {len(symbols)} symbols ({years} years)")
         
         from .extreme_collector import ExtremeDataCollector
         collector = ExtremeDataCollector()
@@ -243,7 +243,7 @@ class ExtremePreprocessor:
         all_data = []
         
         for symbol in symbols:
-            logger.info(f"📊 Processing {symbol}...")
+            logger.info(f" Processing {symbol}...")
             
             # Get massive stock data
             stock_data = collector.get_massive_stock_data(symbol, years)
@@ -272,11 +272,11 @@ class ExtremePreprocessor:
                 
                 if not final_data.empty:
                     all_data.append(final_data)
-                    logger.info(f"✅ {symbol}: {len(final_data)} records with {len(final_data.columns)} features")
+                    logger.info(f" {symbol}: {len(final_data)} records with {len(final_data.columns)} features")
         
         if all_data:
             combined_dataset = pd.concat(all_data, ignore_index=True)
-            logger.info(f"🎉 EXTREME dataset created: {len(combined_dataset)} records, {len(combined_dataset.columns)} features")
+            logger.info(f" EXTREME dataset created: {len(combined_dataset)} records, {len(combined_dataset.columns)} features")
             return combined_dataset
         
         return pd.DataFrame()

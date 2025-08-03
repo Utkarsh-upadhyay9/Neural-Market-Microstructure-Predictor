@@ -45,7 +45,7 @@ class MarketPredictor:
             model_types = ['lstm', 'cnn', 'attention']
         
         try:
-            logger.info("🔄 Loading trained models...")
+            logger.info(" Loading trained models...")
             
             for model_type in model_types:
                 model_path = f"models/{model_type}_model.h5"
@@ -64,15 +64,15 @@ class MarketPredictor:
                         model.load_model(model_path)
                         self.models['attention'] = model
                     
-                    logger.info(f"✅ Loaded {model_type.upper()} model")
+                    logger.info(f" Loaded {model_type.upper()} model")
                 else:
-                    logger.warning(f"⚠️  Model file not found: {model_path}")
+                    logger.warning(f"⚠  Model file not found: {model_path}")
             
             if self.models:
-                logger.info(f"🎉 Successfully loaded {len(self.models)} models")
+                logger.info(f" Successfully loaded {len(self.models)} models")
                 return True
             else:
-                logger.error("❌ No models loaded")
+                logger.error(" No models loaded")
                 return False
                 
         except Exception as e:
@@ -91,7 +91,7 @@ class MarketPredictor:
             Prepared data array or None
         """
         try:
-            logger.info(f"📊 Preparing prediction data for {symbol}")
+            logger.info(f" Preparing prediction data for {symbol}")
             
             # Get recent data
             data = self.data_collector.get_yahoo_data(symbol, period=f"{lookback_days}d")
@@ -124,7 +124,7 @@ class MarketPredictor:
                 
                 # Scale the data (you would need the scaler from training)
                 # For now, we'll use the data as-is
-                logger.info(f"✅ Prepared prediction data: {latest_sequence.shape}")
+                logger.info(f" Prepared prediction data: {latest_sequence.shape}")
                 return latest_sequence
             else:
                 logger.error(f"Not enough data points for {symbol}")
@@ -203,7 +203,7 @@ class MarketPredictor:
                     'confidence': self.calculate_confidence(predictions['models'])
                 }
                 
-                logger.info(f"  🎯 ENSEMBLE: ${ensemble_price:.2f} ({ensemble_change_pct:+.2f}%) [Confidence: {predictions['ensemble']['confidence']:.1f}%]")
+                logger.info(f"   ENSEMBLE: ${ensemble_price:.2f} ({ensemble_change_pct:+.2f}%) [Confidence: {predictions['ensemble']['confidence']:.1f}%]")
             
             return predictions
             
@@ -223,8 +223,8 @@ class MarketPredictor:
             Dictionary with all predictions
         """
         logger.info(f"🔮 Making predictions for {len(symbols)} symbols")
-        logger.info(f"👤 User: Utkarsh-upadhyay9")
-        logger.info(f"📅 Time: {datetime.now()}")
+        logger.info(f" User: Utkarsh-upadhyay9")
+        logger.info(f" Time: {datetime.now()}")
         
         all_predictions = {
             'timestamp': datetime.now().isoformat(),
@@ -232,17 +232,17 @@ class MarketPredictor:
         }
         
         for symbol in symbols:
-            logger.info(f"\n📈 Predicting {symbol}...")
+            logger.info(f"\n Predicting {symbol}...")
             prediction = self.predict_single_symbol(symbol, models)
             
             if prediction:
                 all_predictions['symbols'][symbol] = prediction
             else:
-                logger.warning(f"⚠️  No prediction generated for {symbol}")
+                logger.warning(f"⚠  No prediction generated for {symbol}")
         
         # Summary
         successful_predictions = len(all_predictions['symbols'])
-        logger.info(f"\n✅ Completed predictions for {successful_predictions}/{len(symbols)} symbols")
+        logger.info(f"\n Completed predictions for {successful_predictions}/{len(symbols)} symbols")
         
         return all_predictions
     
@@ -330,7 +330,7 @@ class MarketPredictor:
             with open(filename, 'w') as f:
                 json.dump(predictions, f, indent=2, default=str)
             
-            logger.info(f"💾 Predictions saved to {filename}")
+            logger.info(f" Predictions saved to {filename}")
             
         except Exception as e:
             logger.error(f"Error saving predictions: {e}")

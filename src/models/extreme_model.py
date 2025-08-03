@@ -24,7 +24,7 @@ class ExtremeNeuralNetwork:
     def build_extreme_architecture(self, input_shape: Tuple[int, int], output_dim: int = 1) -> Model:
         """Build extremely heavy neural network."""
         try:
-            logger.info(f"🔥 Building EXTREME architecture: {input_shape}")
+            logger.info(f" Building EXTREME architecture: {input_shape}")
             
             # Input layer
             input_layer = Input(shape=input_shape, name='main_input')
@@ -99,7 +99,7 @@ class ExtremeNeuralNetwork:
                 metrics=['mae']
             )
             
-            logger.info(f"✅ Extreme model built: {model.count_params():,} parameters")
+            logger.info(f" Extreme model built: {model.count_params():,} parameters")
             self.model = model
             return model
             
@@ -211,7 +211,7 @@ class ExtremeNeuralNetwork:
     def train_extreme_model(self, X_train, y_train, X_val, y_val, epochs=200, batch_size=32):
         """Train the extreme model."""
         try:
-            logger.info(f"🔥 Training EXTREME model...")
+            logger.info(f" Training EXTREME model...")
             
             # Prepare multiple outputs
             y_train_dict = {
@@ -263,7 +263,7 @@ class ExtremeNeuralNetwork:
                 verbose=1
             )
             
-            logger.info("✅ Extreme model training completed")
+            logger.info(" Extreme model training completed")
             return history.history
             
         except Exception as e:

@@ -15,9 +15,9 @@ import numpy as np
 # Setup logging
 logger.add(sys.stderr, format="{time} | {level} | {message}", level="INFO")
 
-logger.info('🔥 EXTREME MODEL TRAINING INITIATED')
-logger.info(f'👤 User: Utkarsh-upadhyay9')
-logger.info(f'📅 Time: {datetime.now()}')
+logger.info(' EXTREME MODEL TRAINING INITIATED')
+logger.info(f' User: Utkarsh-upadhyay9')
+logger.info(f' Time: {datetime.now()}')
 
 
 def check_existing_checkpoint():
@@ -29,7 +29,7 @@ def check_existing_checkpoint():
     
     for path in checkpoint_paths:
         if os.path.exists(path):
-            logger.info(f'📁 Found existing checkpoint: {path}')
+            logger.info(f' Found existing checkpoint: {path}')
             return path
     
     return None
@@ -40,10 +40,10 @@ def load_existing_dataset():
     dataset_path = 'data/extreme_dataset.csv'
     
     if os.path.exists(dataset_path):
-        logger.info(f'📁 Loading existing dataset: {dataset_path}')
+        logger.info(f' Loading existing dataset: {dataset_path}')
         try:
             dataset = pd.read_csv(dataset_path)
-            logger.info(f'✅ Loaded dataset: {dataset.shape}')
+            logger.info(f' Loaded dataset: {dataset.shape}')
             return dataset
         except Exception as e:
             logger.error(f'Error loading dataset: {e}')
@@ -80,7 +80,7 @@ def create_extreme_dataset_simple():
             'XOM', 'CVX'
         ]
         
-        logger.info(f'📊 Collecting data for {len(MEGA_SYMBOLS)} symbols')
+        logger.info(f' Collecting data for {len(MEGA_SYMBOLS)} symbols')
         
         collector = DataCollector()
         preprocessor = DataPreprocessor()
@@ -89,7 +89,7 @@ def create_extreme_dataset_simple():
         
         for i, symbol in enumerate(MEGA_SYMBOLS):
             try:
-                logger.info(f'📈 Processing {symbol} ({i+1}/{len(MEGA_SYMBOLS)})...')
+                logger.info(f' Processing {symbol} ({i+1}/{len(MEGA_SYMBOLS)})...')
                 
                 # Get 5 years of data for each symbol
                 data = collector.get_yahoo_data(symbol, period="5y")
@@ -100,29 +100,29 @@ def create_extreme_dataset_simple():
                     enhanced_data['symbol'] = symbol
                     
                     all_data.append(enhanced_data)
-                    logger.info(f'  ✅ {symbol}: {len(enhanced_data)} records with {len(enhanced_data.columns)} features')
+                    logger.info(f'   {symbol}: {len(enhanced_data)} records with {len(enhanced_data.columns)} features')
                 else:
-                    logger.warning(f'  ⚠️  No data for {symbol}')
+                    logger.warning(f'  ⚠  No data for {symbol}')
                     
             except Exception as e:
-                logger.error(f'  ❌ Error with {symbol}: {e}')
+                logger.error(f'   Error with {symbol}: {e}')
                 continue
         
         if all_data:
             # Combine all data
             combined_dataset = pd.concat(all_data, ignore_index=True)
-            logger.info(f'🎉 EXTREME dataset created: {len(combined_dataset)} records, {len(combined_dataset.columns)} features')
+            logger.info(f' EXTREME dataset created: {len(combined_dataset)} records, {len(combined_dataset.columns)} features')
             
             # Ensure data directory exists
             os.makedirs('data', exist_ok=True)
             
             # Save the dataset
             combined_dataset.to_csv('data/extreme_dataset.csv', index=False)
-            logger.info('💾 Dataset saved to data/extreme_dataset.csv')
+            logger.info(' Dataset saved to data/extreme_dataset.csv')
             
             return combined_dataset
         else:
-            logger.error('❌ No data collected')
+            logger.error(' No data collected')
             return None
             
     except Exception as e:
@@ -139,7 +139,7 @@ def create_heavy_model(input_shape):
         from tensorflow.keras.models import Model
         from tensorflow.keras.optimizers import Adam
         
-        logger.info(f'🧠 Building HEAVY model with input shape: {input_shape}')
+        logger.info(f' Building HEAVY model with input shape: {input_shape}')
         
         # Input layer
         input_layer = Input(shape=input_shape)
@@ -202,7 +202,7 @@ def create_heavy_model(input_shape):
         )
         
         param_count = model.count_params()
-        logger.info(f'✅ HEAVY model built: {param_count:,} parameters')
+        logger.info(f' HEAVY model built: {param_count:,} parameters')
         
         return model
         
@@ -218,7 +218,7 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
         from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
         from sklearn.preprocessing import StandardScaler
         
-        logger.info('🚀 Training HEAVY model...')
+        logger.info(' Training HEAVY model...')
         
         # Prepare data
         from src.data.preprocessor import DataPreprocessor
@@ -228,7 +228,7 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
         processed_data = preprocessor.preprocess_pipeline(dataset, sequence_length=120, target_column='close')
         
         if not processed_data:
-            logger.error('❌ Data preprocessing failed')
+            logger.error(' Data preprocessing failed')
             return None
         
         X_train = processed_data['X_train']
@@ -236,8 +236,8 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
         y_train = processed_data['y_train']
         y_test = processed_data['y_test']
         
-        logger.info(f'📊 Training data: {X_train.shape}')
-        logger.info(f'📊 Test data: {X_test.shape}')
+        logger.info(f' Training data: {X_train.shape}')
+        logger.info(f' Test data: {X_test.shape}')
         
         # Create validation split
         val_split = int(len(X_train) * 0.8)
@@ -252,13 +252,13 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
             checkpoint_path = check_existing_checkpoint()
         
         if checkpoint_path:
-            logger.info(f'🔄 RESUMING from checkpoint: {checkpoint_path}')
+            logger.info(f' RESUMING from checkpoint: {checkpoint_path}')
             try:
                 heavy_model = tf.keras.models.load_model(checkpoint_path)
-                logger.info('✅ Successfully loaded checkpoint model')
+                logger.info(' Successfully loaded checkpoint model')
             except Exception as e:
-                logger.warning(f'⚠️  Failed to load checkpoint: {e}')
-                logger.info('🔄 Creating new model instead...')
+                logger.warning(f'⚠  Failed to load checkpoint: {e}')
+                logger.info(' Creating new model instead...')
                 input_shape = (X_train.shape[1], X_train.shape[2])
                 heavy_model = create_heavy_model(input_shape)
         else:
@@ -296,7 +296,7 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
         ]
         
         # Train model
-        logger.info('🔥 Starting/Resuming training...')
+        logger.info(' Starting/Resuming training...')
         history = heavy_model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val),
@@ -307,16 +307,16 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
         )
         
         # Evaluate - FIXED BUG HERE
-        logger.info('📊 Evaluating model...')
+        logger.info(' Evaluating model...')
         test_loss, test_mae = heavy_model.evaluate(X_test, y_test, verbose=0)  # Fixed: removed .model
         
-        logger.info(f'✅ HEAVY model training completed!')
-        logger.info(f'📈 Test Loss: {test_loss:.4f}')
-        logger.info(f'📊 Test MAE: {test_mae:.4f}')
+        logger.info(f' HEAVY model training completed!')
+        logger.info(f' Test Loss: {test_loss:.4f}')
+        logger.info(f' Test MAE: {test_mae:.4f}')
         
         # Save final model
         heavy_model.save('models/extreme_heavy_final.keras')
-        logger.info('💾 Final model saved to models/extreme_heavy_final.keras')
+        logger.info(' Final model saved to models/extreme_heavy_final.keras')
         
         return heavy_model, history.history
         
@@ -328,33 +328,33 @@ def train_heavy_model(dataset, resume_from_checkpoint=True):
 def main():
     """Main function."""
     try:
-        logger.info('🔥 STARTING EXTREME TRAINING PROCESS')
+        logger.info(' STARTING EXTREME TRAINING PROCESS')
         
         # Step 1: Create massive dataset (or load existing)
-        logger.info('\n📊 STEP 1: Preparing massive dataset...')
+        logger.info('\n STEP 1: Preparing massive dataset...')
         dataset = create_extreme_dataset_simple()
         
         if dataset is None:
-            logger.error('❌ Failed to create/load dataset')
+            logger.error(' Failed to create/load dataset')
             return 1
         
         # Step 2: Train heavy model (with resume capability)
-        logger.info('\n🧠 STEP 2: Training heavy model...')
+        logger.info('\n STEP 2: Training heavy model...')
         result = train_heavy_model(dataset, resume_from_checkpoint=True)
         
         if result is None:
-            logger.error('❌ Failed to train model')
+            logger.error(' Failed to train model')
             return 1
         
         model, history = result
         
-        logger.info('\n🎉 EXTREME TRAINING COMPLETED SUCCESSFULLY!')
-        logger.info('🚀 Your extreme model is ready for predictions!')
+        logger.info('\n EXTREME TRAINING COMPLETED SUCCESSFULLY!')
+        logger.info(' Your extreme model is ready for predictions!')
         
         return 0
         
     except KeyboardInterrupt:
-        logger.info('\n⚠️  Training interrupted by user')
+        logger.info('\n⚠  Training interrupted by user')
         logger.info('💡 You can resume training by running the script again!')
         return 1
     except Exception as e:

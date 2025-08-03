@@ -50,7 +50,7 @@ class ExtremeDataCollector:
     def get_massive_stock_data(self, symbol: str, years: int = 10) -> pd.DataFrame:
         """Get massive historical data."""
         try:
-            logger.info(f"🔥 Collecting MASSIVE data for {symbol} ({years} years)")
+            logger.info(f" Collecting MASSIVE data for {symbol} ({years} years)")
             
             # Primary source: Yahoo Finance (daily data)
             ticker = yf.Ticker(symbol)
@@ -71,7 +71,7 @@ class ExtremeDataCollector:
             # Combine with extra intraday features
             combined_data = self._combine_timeframes(hist_data, daily_from_1h, daily_from_15m, daily_from_5m)
             
-            logger.info(f"✅ Collected {len(combined_data)} records with multi-timeframe data")
+            logger.info(f" Collected {len(combined_data)} records with multi-timeframe data")
             return combined_data
             
         except Exception as e:
@@ -81,7 +81,7 @@ class ExtremeDataCollector:
     def get_fundamental_data(self, symbol: str) -> Dict:
         """Get comprehensive fundamental data."""
         try:
-            logger.info(f"📊 Getting fundamental data for {symbol}")
+            logger.info(f" Getting fundamental data for {symbol}")
             
             fundamentals = {}
             
@@ -111,7 +111,7 @@ class ExtremeDataCollector:
             earnings, _ = self.fd.get_earnings(symbol)
             fundamentals['earnings'] = earnings
             
-            logger.info(f"✅ Collected comprehensive fundamental data")
+            logger.info(f" Collected comprehensive fundamental data")
             return fundamentals
             
         except Exception as e:
@@ -150,16 +150,16 @@ class ExtremeDataCollector:
                     try:
                         data = self.fred.get_series(series_id, limit=2000)
                         economic_data[name] = data
-                        logger.info(f"  ✅ {name}: {len(data)} points")
+                        logger.info(f"   {name}: {len(data)} points")
                         time.sleep(0.1)  # Be nice to API
                     except Exception as e:
-                        logger.warning(f"  ⚠️  Failed to get {name}: {e}")
+                        logger.warning(f"  ⚠  Failed to get {name}: {e}")
             
             # Convert to DataFrame
             if economic_data:
                 econ_df = pd.DataFrame(economic_data)
                 econ_df.index = pd.to_datetime(econ_df.index)
-                logger.info(f"✅ Economic indicators: {len(econ_df)} records")
+                logger.info(f" Economic indicators: {len(econ_df)} records")
                 return econ_df
             
             return pd.DataFrame()
@@ -199,14 +199,14 @@ class ExtremeDataCollector:
                     if not data.empty:
                         sector_data[f'{etf}_close'] = data['Close']
                         sector_data[f'{etf}_volume'] = data['Volume']
-                        logger.info(f"  ✅ {name} ({etf}): {len(data)} records")
+                        logger.info(f"   {name} ({etf}): {len(data)} records")
                     time.sleep(0.1)
                 except Exception as e:
-                    logger.warning(f"  ⚠️  Failed {etf}: {e}")
+                    logger.warning(f"  ⚠  Failed {etf}: {e}")
             
             if sector_data:
                 sector_df = pd.DataFrame(sector_data)
-                logger.info(f"✅ Sector data: {len(sector_df)} records")
+                logger.info(f" Sector data: {len(sector_df)} records")
                 return sector_df
             
             return pd.DataFrame()
@@ -218,7 +218,7 @@ class ExtremeDataCollector:
     def get_options_data(self, symbol: str) -> Dict:
         """Get options data for volatility analysis."""
         try:
-            logger.info(f"📈 Getting options data for {symbol}")
+            logger.info(f" Getting options data for {symbol}")
             
             ticker = yf.Ticker(symbol)
             
@@ -234,10 +234,10 @@ class ExtremeDataCollector:
                         'calls': chain.calls,
                         'puts': chain.puts
                     }
-                    logger.info(f"  ✅ Options for {date}")
+                    logger.info(f"   Options for {date}")
                     time.sleep(0.1)
                 except Exception as e:
-                    logger.warning(f"  ⚠️  Failed options for {date}: {e}")
+                    logger.warning(f"  ⚠  Failed options for {date}: {e}")
             
             return options_data
             
@@ -288,7 +288,7 @@ class ExtremeDataCollector:
                 # Add sentiment analysis (simplified)
                 news_df['sentiment_score'] = self._analyze_sentiment(news_df)
                 
-                logger.info(f"✅ News data: {len(news_df)} articles")
+                logger.info(f" News data: {len(news_df)} articles")
                 return news_df
             
             return pd.DataFrame()

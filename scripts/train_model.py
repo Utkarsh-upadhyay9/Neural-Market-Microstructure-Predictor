@@ -19,13 +19,13 @@ from utils import setup_logging, load_config
 
 def load_training_data(symbols: list, source: str = "yahoo") -> pd.DataFrame:
     """Load training data from specified source."""
-    logger.info(f"📊 Loading training data for symbols: {symbols}")
+    logger.info(f" Loading training data for symbols: {symbols}")
     
     collector = DataCollector()
     all_data = []
     
     for symbol in symbols:
-        logger.info(f"  📈 Loading {symbol}...")
+        logger.info(f"   Loading {symbol}...")
         
         if source == "yahoo":
             data = collector.get_yahoo_data(symbol, period="2y")  # 2 years of data
@@ -37,16 +37,16 @@ def load_training_data(symbols: list, source: str = "yahoo") -> pd.DataFrame:
         
         if not data.empty:
             all_data.append(data)
-            logger.info(f"    ✅ Loaded {len(data)} records")
+            logger.info(f"     Loaded {len(data)} records")
         else:
-            logger.warning(f"    ⚠️  No data for {symbol}")
+            logger.warning(f"    ⚠  No data for {symbol}")
     
     if all_data:
         combined_data = pd.concat(all_data, ignore_index=True)
-        logger.info(f"✅ Combined dataset: {len(combined_data)} total records")
+        logger.info(f" Combined dataset: {len(combined_data)} total records")
         return combined_data
     else:
-        logger.error("❌ No training data loaded")
+        logger.error(" No training data loaded")
         return pd.DataFrame()
 
 
@@ -71,13 +71,13 @@ def main():
     # Setup logging
     setup_logging()
     
-    logger.info("🚀 Neural Market Predictor - Model Training")
+    logger.info(" Neural Market Predictor - Model Training")
     logger.info("=" * 60)
-    logger.info(f"👤 User: Utkarsh-upadhyay9")
-    logger.info(f"📅 Time: {datetime.now()}")
+    logger.info(f" User: Utkarsh-upadhyay9")
+    logger.info(f" Time: {datetime.now()}")
     logger.info(f"🤖 Models: {args.models}")
-    logger.info(f"📈 Symbols: {args.symbols}")
-    logger.info(f"📊 Source: {args.source}")
+    logger.info(f" Symbols: {args.symbols}")
+    logger.info(f" Source: {args.source}")
     
     try:
         # Load training data
@@ -94,20 +94,20 @@ def main():
         if args.epochs:
             config = load_config(args.config)
             config['training']['epochs'] = args.epochs
-            logger.info(f"🔧 Using {args.epochs} epochs")
+            logger.info(f" Using {args.epochs} epochs")
         
         # Train models
         results = trainer.train_all_models(training_data, args.models)
         
         if results:
-            logger.info("\n🎉 Training completed successfully!")
-            logger.info("📁 Check the following directories:")
+            logger.info("\n Training completed successfully!")
+            logger.info(" Check the following directories:")
             logger.info("  🤖 models/ - Trained model files")
-            logger.info("  📊 results/ - Training results and metrics")
+            logger.info("   results/ - Training results and metrics")
             
             # Show quick summary
             if 'models' in results:
-                logger.info("\n📈 TRAINING SUMMARY:")
+                logger.info("\n TRAINING SUMMARY:")
                 for model_name, model_result in results['models'].items():
                     metrics = model_result['metrics']
                     logger.info(f"  {model_name.upper()}: RMSE={metrics.get('rmse', 0):.4f}, "
@@ -119,7 +119,7 @@ def main():
             return 1
             
     except KeyboardInterrupt:
-        logger.info("\n⚠️  Training interrupted by user")
+        logger.info("\n⚠  Training interrupted by user")
         return 1
     except Exception as e:
         logger.error(f"Training error: {e}")

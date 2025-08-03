@@ -13,10 +13,10 @@ import pandas as pd
 
 def quick_test():
     """Quick test of all systems."""
-    print("🚀 Neural Market Predictor - Quick Start")
+    print(" Neural Market Predictor - Quick Start")
     print("=" * 60)
-    print("👤 User: Utkarsh-upadhyay9")
-    print("📅 Date: 2025-08-02 16:47:24 UTC")
+    print(" User: Utkarsh-upadhyay9")
+    print(" Date: 2025-08-02 16:47:24 UTC")
     print("🔑 APIs: Alpha Vantage, NewsAPI, Nasdaq Data Link")
     
     # Test APIs
@@ -24,7 +24,7 @@ def quick_test():
     test_apis()
     
     # Quick data collection
-    print("\n📊 Quick data collection test...")
+    print("\n Quick data collection test...")
     try:
         collector = DataCollector("config/config.yaml")
         
@@ -32,19 +32,19 @@ def quick_test():
         data = collector.get_yahoo_data("AAPL", period="5d")
         
         if not data.empty:
-            print(f"✅ Collected {len(data)} records for AAPL")
-            print(f"📈 Price range: ${data['close'].min():.2f} - ${data['close'].max():.2f}")
+            print(f" Collected {len(data)} records for AAPL")
+            print(f" Price range: ${data['close'].min():.2f} - ${data['close'].max():.2f}")
             
             # Save sample
             os.makedirs("data/raw", exist_ok=True)
             collector.save_data(data, "data/raw/sample_aapl.csv")
-            print("💾 Sample saved to data/raw/sample_aapl.csv")
+            print(" Sample saved to data/raw/sample_aapl.csv")
         
-        print("\n🎉 Quick start completed successfully!")
-        print("🚀 Ready to build your market predictor!")
+        print("\n Quick start completed successfully!")
+        print(" Ready to build your market predictor!")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
 
 if __name__ == "__main__":
     quick_test()

@@ -42,7 +42,7 @@ class ModelTrainer:
             Dictionary with prepared data
         """
         try:
-            logger.info("🔄 Preparing data for training...")
+            logger.info(" Preparing data for training...")
             
             # Use preprocessor pipeline
             sequence_length = self.config['models']['lstm']['sequence_length']
@@ -81,10 +81,10 @@ class ModelTrainer:
                 'original_data': processed_data['original_data']
             }
             
-            logger.info(f"✅ Data prepared successfully:")
-            logger.info(f"  📊 Training: {X_train_split.shape}")
-            logger.info(f"  📊 Validation: {X_val.shape}")
-            logger.info(f"  📊 Testing: {processed_data['X_test'].shape}")
+            logger.info(f" Data prepared successfully:")
+            logger.info(f"   Training: {X_train_split.shape}")
+            logger.info(f"   Validation: {X_val.shape}")
+            logger.info(f"   Testing: {processed_data['X_test'].shape}")
             logger.info(f"  🔢 Features: {len(processed_data['feature_columns'])}")
             
             return result
@@ -96,7 +96,7 @@ class ModelTrainer:
     def train_lstm_model(self, data: Dict) -> Dict:
         """Train LSTM model."""
         try:
-            logger.info("🧠 Training LSTM model...")
+            logger.info(" Training LSTM model...")
             
             # Initialize model
             lstm_config = self.config['models']['lstm']
@@ -137,10 +137,10 @@ class ModelTrainer:
                 'model_type': 'LSTM'
             }
             
-            logger.info(f"✅ LSTM training completed:")
-            logger.info(f"  📈 RMSE: {metrics.get('rmse', 0):.4f}")
-            logger.info(f"  📊 MAE: {metrics.get('mae', 0):.4f}")
-            logger.info(f"  🎯 Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
+            logger.info(f" LSTM training completed:")
+            logger.info(f"   RMSE: {metrics.get('rmse', 0):.4f}")
+            logger.info(f"   MAE: {metrics.get('mae', 0):.4f}")
+            logger.info(f"   Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
             
             return result
             
@@ -151,7 +151,7 @@ class ModelTrainer:
     def train_cnn_model(self, data: Dict) -> Dict:
         """Train CNN model."""
         try:
-            logger.info("🧠 Training CNN model...")
+            logger.info(" Training CNN model...")
             
             # Initialize model
             cnn_config = self.config['models']['cnn']
@@ -191,10 +191,10 @@ class ModelTrainer:
                 'model_type': 'CNN'
             }
             
-            logger.info(f"✅ CNN training completed:")
-            logger.info(f"  📈 RMSE: {metrics.get('rmse', 0):.4f}")
-            logger.info(f"  📊 MAE: {metrics.get('mae', 0):.4f}")
-            logger.info(f"  🎯 Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
+            logger.info(f" CNN training completed:")
+            logger.info(f"   RMSE: {metrics.get('rmse', 0):.4f}")
+            logger.info(f"   MAE: {metrics.get('mae', 0):.4f}")
+            logger.info(f"   Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
             
             return result
             
@@ -205,7 +205,7 @@ class ModelTrainer:
     def train_attention_model(self, data: Dict) -> Dict:
         """Train Attention model."""
         try:
-            logger.info("🧠 Training Attention model...")
+            logger.info(" Training Attention model...")
             
             # Initialize model
             attention_config = self.config['models']['attention']
@@ -245,10 +245,10 @@ class ModelTrainer:
                 'model_type': 'Attention'
             }
             
-            logger.info(f"✅ Attention training completed:")
-            logger.info(f"  📈 RMSE: {metrics.get('rmse', 0):.4f}")
-            logger.info(f"  📊 MAE: {metrics.get('mae', 0):.4f}")
-            logger.info(f"  🎯 Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
+            logger.info(f" Attention training completed:")
+            logger.info(f"   RMSE: {metrics.get('rmse', 0):.4f}")
+            logger.info(f"   MAE: {metrics.get('mae', 0):.4f}")
+            logger.info(f"   Directional Accuracy: {metrics.get('directional_accuracy', 0):.2f}%")
             
             return result
             
@@ -270,9 +270,9 @@ class ModelTrainer:
         if models is None:
             models = ['lstm', 'cnn', 'attention']
         
-        logger.info(f"🚀 Starting training pipeline for models: {models}")
-        logger.info(f"👤 User: Utkarsh-upadhyay9")
-        logger.info(f"📅 Time: {datetime.now()}")
+        logger.info(f" Starting training pipeline for models: {models}")
+        logger.info(f" User: Utkarsh-upadhyay9")
+        logger.info(f" Time: {datetime.now()}")
         
         # Prepare data
         prepared_data = self.prepare_data(data)
@@ -293,7 +293,7 @@ class ModelTrainer:
         
         # Train each model
         for model_name in models:
-            logger.info(f"\n🔄 Training {model_name.upper()} model...")
+            logger.info(f"\n Training {model_name.upper()} model...")
             
             if model_name == 'lstm':
                 result = self.train_lstm_model(prepared_data)
@@ -315,7 +315,7 @@ class ModelTrainer:
         # Compare models
         self.compare_models(results)
         
-        logger.info("🎉 Training pipeline completed!")
+        logger.info(" Training pipeline completed!")
         return results
     
     def save_training_results(self, results: Dict):
@@ -341,7 +341,7 @@ class ModelTrainer:
             with open('results/training_results.json', 'w') as f:
                 json.dump(json_results, f, indent=2)
             
-            logger.info("💾 Training results saved to results/training_results.json")
+            logger.info(" Training results saved to results/training_results.json")
             
         except Exception as e:
             logger.error(f"Error saving training results: {e}")
@@ -349,7 +349,7 @@ class ModelTrainer:
     def compare_models(self, results: Dict):
         """Compare model performances."""
         try:
-            logger.info("\n📊 MODEL COMPARISON")
+            logger.info("\n MODEL COMPARISON")
             logger.info("=" * 50)
             
             comparison_data = []

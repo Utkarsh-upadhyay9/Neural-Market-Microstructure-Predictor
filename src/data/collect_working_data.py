@@ -20,12 +20,12 @@ NEWSAPI_KEY = "799d9f41a7c240d18c06860ca1ffa31e"
 
 def collect_yahoo_data(symbols, period="1y"):
     """Collect data from Yahoo Finance."""
-    print("📊 Collecting Yahoo Finance data...")
+    print(" Collecting Yahoo Finance data...")
     data_dict = {}
     
     for symbol in symbols:
         try:
-            print(f"  📈 Fetching {symbol}...")
+            print(f"   Fetching {symbol}...")
             ticker = yf.Ticker(symbol)
             data = ticker.history(period=period)
             
@@ -36,18 +36,18 @@ def collect_yahoo_data(symbols, period="1y"):
                 data['symbol'] = symbol
                 
                 data_dict[symbol] = data
-                print(f"    ✅ Success: {len(data)} records")
+                print(f"     Success: {len(data)} records")
                 
                 # Save individual file
                 os.makedirs("data/raw", exist_ok=True)
                 filename = f"data/raw/{symbol}_yahoo_1y.csv"
                 data.to_csv(filename, index=False)
-                print(f"    💾 Saved: {filename}")
+                print(f"     Saved: {filename}")
             else:
-                print(f"    ❌ No data for {symbol}")
+                print(f"     No data for {symbol}")
                 
         except Exception as e:
-            print(f"    ❌ Error for {symbol}: {e}")
+            print(f"     Error for {symbol}: {e}")
         
         time.sleep(0.5)  # Be nice to the API
     
@@ -55,15 +55,15 @@ def collect_yahoo_data(symbols, period="1y"):
 
 def collect_alpha_vantage_data(symbols, limit=3):
     """Collect data from Alpha Vantage (limited calls)."""
-    print("📊 Collecting Alpha Vantage data...")
-    print(f"⚠️  Limited to {limit} symbols due to free tier (25 calls/day)")
+    print(" Collecting Alpha Vantage data...")
+    print(f"⚠  Limited to {limit} symbols due to free tier (25 calls/day)")
     
     data_dict = {}
     base_url = "https://www.alphavantage.co/query"
     
     for i, symbol in enumerate(symbols[:limit]):
         try:
-            print(f"  📈 Fetching {symbol} ({i+1}/{limit})...")
+            print(f"   Fetching {symbol} ({i+1}/{limit})...")
             
             params = {
                 'function': 'TIME_SERIES_DAILY',
@@ -90,22 +90,22 @@ def collect_alpha_vantage_data(symbols, limit=3):
                     df[col] = pd.to_numeric(df[col])
                 
                 data_dict[symbol] = df
-                print(f"    ✅ Success: {len(df)} records")
+                print(f"     Success: {len(df)} records")
                 
                 # Save individual file
                 os.makedirs("data/raw", exist_ok=True)
                 filename = f"data/raw/{symbol}_alphavantage_daily.csv"
                 df.to_csv(filename, index=False)
-                print(f"    💾 Saved: {filename}")
+                print(f"     Saved: {filename}")
                 
             elif 'Note' in data:
-                print(f"    ⚠️  Rate limit hit: {data['Note']}")
+                print(f"    ⚠  Rate limit hit: {data['Note']}")
                 break
             else:
-                print(f"    ❌ Error: {data}")
+                print(f"     Error: {data}")
             
         except Exception as e:
-            print(f"    ❌ Error for {symbol}: {e}")
+            print(f"     Error for {symbol}: {e}")
         
         # Rate limiting - Alpha Vantage free tier: 5 calls per minute
         if i < limit - 1:
@@ -141,13 +141,13 @@ def collect_news_data(query="stock market", days=7):
             df['publishedAt'] = pd.to_datetime(df['publishedAt'])
             df = df.sort_values('publishedAt', ascending=False).reset_index(drop=True)
             
-            print(f"  ✅ Success: {len(df)} articles")
+            print(f"   Success: {len(df)} articles")
             
             # Save news data
             os.makedirs("data/raw", exist_ok=True)
             filename = "data/raw/news_data.csv"
             df.to_csv(filename, index=False)
-            print(f"  💾 Saved: {filename}")
+            print(f"   Saved: {filename}")
             
             # Show sample headlines
             print("  📄 Sample headlines:")
@@ -156,18 +156,18 @@ def collect_news_data(query="stock market", days=7):
             
             return df
         else:
-            print(f"  ❌ Error: {data}")
+            print(f"   Error: {data}")
             return pd.DataFrame()
             
     except Exception as e:
-        print(f"  ❌ Error: {e}")
+        print(f"   Error: {e}")
         return pd.DataFrame()
 
 def main():
     """Main data collection function."""
-    print("🚀 Neural Market Predictor - Data Collection")
+    print(" Neural Market Predictor - Data Collection")
     print("=" * 60)
-    print("👤 User: Utkarsh-upadhyay9")
+    print(" User: Utkarsh-upadhyay9")
     print(f"⏰ Time: {datetime.now()}")
     print("🔑 Using: Alpha Vantage + NewsAPI + Yahoo Finance")
     
@@ -187,13 +187,13 @@ def main():
     
     # Summary
     print("\n" + "=" * 60)
-    print("📊 COLLECTION SUMMARY")
-    print(f"✅ Yahoo Finance: {len(yahoo_data)} symbols")
-    print(f"✅ Alpha Vantage: {len(alpha_data)} symbols")
-    print(f"✅ News Articles: {len(news_data)} articles")
+    print(" COLLECTION SUMMARY")
+    print(f" Yahoo Finance: {len(yahoo_data)} symbols")
+    print(f" Alpha Vantage: {len(alpha_data)} symbols")
+    print(f" News Articles: {len(news_data)} articles")
     
     # Show file structure
-    print(f"\n📁 Files created in data/raw/:")
+    print(f"\n Files created in data/raw/:")
     try:
         files = os.listdir("data/raw")
         for file in sorted(files):
@@ -201,7 +201,7 @@ def main():
     except:
         print("  (Directory not found)")
     
-    print(f"\n🎉 Data collection completed!")
+    print(f"\n Data collection completed!")
     print(f"💡 Next steps:")
     print(f"  1. Run preprocessing: python scripts/preprocess_data.py")
     print(f"  2. Train models: python scripts/train_model.py")
