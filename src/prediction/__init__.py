@@ -1,3 +1,1 @@
-from .predictor import MarketPredictor
-
-__all__ = ["MarketPredictor"]
+from .predictor import MarketPredictor __all__ = ["MarketPredictor"]
