@@ -1,0 +1,10 @@
+# Docker Deployment
+
+
+## Quick Start
+```bash
+
+# Build and run
+docker-compose up --build
+
+# Access at http://localhost:8000
