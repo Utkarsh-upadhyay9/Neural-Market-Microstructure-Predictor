@@ -75,6 +75,4 @@ config/api_keys.yaml
 .cache/
 .pytest_cache/
 
-# Results that change frequently
-# predictions/*.json
-# results/*.json
+
