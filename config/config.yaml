@@ -1,0 +1,89 @@
+# API Configuration
+api:
+  alpha_vantage:
+    key: "H8U3J9QXHBRSM1KU"
+    base_url: "https://www.alphavantage.co/query"
+  
+  newsapi:
+    key: "799d9f41a7c240d18c06860ca1ffa31e"
+    base_url: "https://newsapi.org/v2"
+  
+  nasdaq_data_link:
+    key: "i3KyqfeL5kfH2Cx6wSK2"
+    base_url: "https://data.nasdaq.com/api/v3"
+  
+  yahoo_finance:
+    enabled: true  # No key needed
+  
+  # Disabled services
+  iex_cloud:
+    enabled: false
+  
+  fred:
+    enabled: false
+
+# Database Configuration
+database:
+  type: "sqlite"  # Start simple
+  path: "data/market_data.db"
+
+# Model Configuration
+models:
+  lstm:
+    sequence_length: 60
+    hidden_units: 50
+    layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    
+  cnn:
+    filters: [32, 64, 128]
+    kernel_sizes: [3, 3, 3]
+    pool_size: 2
+    dropout: 0.25
+    learning_rate: 0.001
+    
+  attention:
+    d_model: 128
+    num_heads: 8
+    num_layers: 4
+    dropout: 0.1
+    learning_rate: 0.0001
+
+# Training Configuration
+training:
+  batch_size: 32
+  epochs: 100
+  validation_split: 0.2
+  early_stopping_patience: 10
+  save_best_only: true
+  
+# Data Configuration
+data:
+  symbols: ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "NVDA", "META"]
+  timeframe: "1min"
+  features: [
+    "open", "high", "low", "close", "volume",
+    "sma_20", "ema_20", "rsi", "macd", "bollinger_bands"
+  ]
+  target: "close"
+  lookback_window: 60
+  
+# Prediction Configuration
+prediction:
+  confidence_threshold: 0.7
+  prediction_horizon: 10  # minutes
+  update_frequency: 60  # seconds
+
+# News sentiment configuration
+news:
+  sources: ["reuters", "bloomberg", "cnbc", "marketwatch"]
+  languages: ["en"]
+  sentiment_threshold: 0.1
+  
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "logs/market_predictor.log"
+  max_size: "10MB"
+  backup_count: 5

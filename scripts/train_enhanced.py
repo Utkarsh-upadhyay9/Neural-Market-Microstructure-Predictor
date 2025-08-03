@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""
+Enhanced training script with better error handling and progress reporting.
+"""
+
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import argparse
+import pandas as pd
+from datetime import datetime
+from loguru import logger
+import time
+
+from src.training.trainer import ModelTrainer
+from src.data.collector import DataCollector
+from utils import setup_logging, load_config
+
+
+def main():
+    """Enhanced training with detailed progress reporting."""
+    parser = argparse.ArgumentParser(description='Train neural network models')
+    parser.add_argument('--models', nargs='+', default=['lstm'], 
+                       choices=['lstm', 'cnn', 'attention'],
+                       help='Models to train')
+    parser.add_argument('--symbols', nargs='+', 
+                       default=['AAPL', 'GOOGL', 'MSFT'],
+                       help='Stock symbols for training')
+    parser.add_argument('--source', choices=['yahoo', 'alpha_vantage'], 
+                       default='yahoo', help='Data source')
+    parser.add_argument('--epochs', type=int, default=50,
+                       help='Number of training epochs')
+    parser.add_argument('--quick', action='store_true',
+                       help='Quick training with fewer epochs')
+    
+    args = parser.parse_args()
+    
+    if args.quick:
+        args.epochs = 10
+        logger.info("🚀 Quick training mode: 10 epochs")
+    
+    # Setup logging
+    setup_logging()
+    
+    logger.info("🧠 Enhanced Neural Market Predictor Training")
+    logger.info("=" * 60)
+    logger.info(f"👤 User: Utkarsh-upadhyay9")
+    logger.info(f"📅 Time: {datetime.now()}")
+    logger.info(f"🤖 Models: {args.models}")
+    logger.info(f"📈 Symbols: {args.symbols}")
+    logger.info(f"⚡ Epochs: {args.epochs}")
+    
+    try:
+        # Load training data
+        logger.info("\n📊 Loading training data...")
+        collector = DataCollector()
+        all_data = []
+        
+        for symbol in args.symbols:
+            logger.info(f"  📈 Loading {symbol}...")
+            data = collector.get_yahoo_data(symbol, period="2y")
+            
+            if not data.empty:
+                all_data.append(data)
+                logger.info(f"    ✅ {len(data)} records")
+            else:
+                logger.warning(f"    ⚠️  No data for {symbol}")
+            
+            time.sleep(0.5)  # Be nice to the API
+        
+        if not all_data:
+            logger.error("No training data loaded")
+            return 1
+        
+        training_data = pd.concat(all_data, ignore_index=True)
+        logger.info(f"✅ Combined dataset: {len(training_data)} records")
+        
+        # Initialize trainer
+        trainer = ModelTrainer()
+        
+        # Override epochs in config
+        trainer.config['training']['epochs'] = args.epochs
+        
+        # Train models one by one for better monitoring
+        results = {'models': {}}
+        
+        for model_name in args.models:
+            logger.info(f"\n🚀 Training {model_name.upper()} model...")
+            logger.info("-" * 40)
+            
+            start_time = time.time()
+            
+            # Prepare data
+            prepared_data = trainer.prepare_data(training_data)
+            if not prepared_data:
+                logger.error(f"Data preparation failed for {model_name}")
+                continue
+            
+            # Train specific model
+            if model_name == 'lstm':
+                result = trainer.train_lstm_model(prepared_data)
+            elif model_name == 'cnn':
+                result = trainer.train_cnn_model(prepared_data)
+            elif model_name == 'attention':
+                result = trainer.train_attention_model(prepared_data)
+            
+            if result:
+                training_time = time.time() - start_time
+                result['training_time'] = training_time
+                results['models'][model_name] = result
+                
+                metrics = result['metrics']
+                logger.info(f"✅ {model_name.upper()} completed in {training_time:.1f}s")
+                logger.info(f"   📈 RMSE: {metrics.get('rmse', 0):.2f}")
+                logger.info(f"   📊 MAE: {metrics.get('mae', 0):.2f}")
+                logger.info(f"   🎯 Direction Accuracy: {metrics.get('directional_accuracy', 0):.1f}%")
+            else:
+                logger.error(f"❌ {model_name.upper()} training failed")
+        
+        # Final summary
+        if results['models']:
+            logger.info("\n🎉 TRAINING COMPLETE!")
+            logger.info("=" * 60)
+            logger.info("📊 FINAL RESULTS:")
+            
+            best_model = None
+            best_rmse = float('inf')
+            
+            for model_name, result in results['models'].items():
+                metrics = result['metrics']
+                rmse = metrics.get('rmse', float('inf'))
+                
+                if rmse < best_rmse:
+                    best_rmse = rmse
+                    best_model = model_name
+                
+                logger.info(f"  {model_name.upper():<10} | RMSE: {rmse:6.2f} | "
+                           f"MAE: {metrics.get('mae', 0):6.2f} | "
+                           f"Dir.Acc: {metrics.get('directional_accuracy', 0):5.1f}%")
+            
+            if best_model:
+                logger.info(f"\n🏆 Best performing model: {best_model.upper()}")
+            
+            logger.info(f"\n📁 Model files saved in: models/")
+            logger.info(f"💡 Ready for predictions! Run:")
+            logger.info(f"   python run_predictions.py --models {' '.join(results['models'].keys())}")
+            
+            return 0
+        else:
+            logger.error("No models trained successfully")
+            return 1
+            
+    except KeyboardInterrupt:
+        logger.info("\n⚠️  Training interrupted by user")
+        return 1
+    except Exception as e:
+        logger.error(f"Training error: {e}")
+        return 1
+
+
+if __name__ == "__main__":
+    exit(main())

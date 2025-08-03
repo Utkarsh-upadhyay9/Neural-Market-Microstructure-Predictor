@@ -1,0 +1,282 @@
+"""
+Extreme preprocessing with massive feature engineering.
+"""
+
+import pandas as pd
+import numpy as np
+import ta
+from typing import List, Tuple, Dict
+from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_regression
+import talib
+from loguru import logger
+
+
+class ExtremePreprocessor:
+    """Ultra-heavy preprocessing with massive feature engineering."""
+    
+    def __init__(self, config: Dict = None):
+        """Initialize extreme preprocessor."""
+        self.config = config or {}
+        self.scalers = {}
+        self.feature_columns = []
+        self.pca = None
+        self.feature_selector = None
+        
+    def add_massive_technical_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Add 200+ technical indicators."""
+        try:
+            logger.info("🔥 Adding MASSIVE technical indicators (200+ features)...")
+            df = data.copy()
+            
+            # Ensure correct columns
+            ohlcv_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+            for col in ohlcv_cols:
+                if col.lower() in df.columns:
+                    df[col] = df[col.lower()]
+            
+            # Basic price features
+            df = self._add_basic_features(df)
+            
+            # Trend indicators (40+ features)
+            df = self._add_trend_indicators(df)
+            
+            # Momentum indicators (30+ features)  
+            df = self._add_momentum_indicators(df)
+            
+            # Volatility indicators (20+ features)
+            df = self._add_volatility_indicators(df)
+            
+            # Volume indicators (25+ features)
+            df = self._add_volume_indicators(df)
+            
+            # Statistical indicators (30+ features)
+            df = self._add_statistical_indicators(df)
+            
+            # Pattern recognition (20+ features)
+            df = self._add_pattern_indicators(df)
+            
+            # Cycle indicators (15+ features)
+            df = self._add_cycle_indicators(df)
+            
+            # Price transformation indicators (20+ features)
+            df = self._add_price_transformations(df)
+            
+            # Cross-timeframe features (15+ features)
+            df = self._add_cross_timeframe_features(df)
+            
+            # Market structure features (10+ features)
+            df = self._add_market_structure_features(df)
+            
+            logger.info(f"💪 Added massive indicators: {len(df.columns)} total features")
+            return df
+            
+        except Exception as e:
+            logger.error(f"Error adding massive indicators: {e}")
+            return data
+    
+    def _add_basic_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add basic price-based features."""
+        # Returns and ratios
+        df['returns'] = df['Close'].pct_change()
+        df['log_returns'] = np.log(df['Close']).diff()
+        df['high_low_ratio'] = df['High'] / df['Low']
+        df['close_open_ratio'] = df['Close'] / df['Open']
+        df['high_close_ratio'] = df['High'] / df['Close']
+        df['low_close_ratio'] = df['Low'] / df['Close']
+        df['volume_price_ratio'] = df['Volume'] / df['Close']
+        
+        # Price gaps
+        df['gap'] = df['Open'] - df['Close'].shift(1)
+        df['gap_pct'] = df['gap'] / df['Close'].shift(1)
+        
+        # Intraday features
+        df['body'] = df['Close'] - df['Open']
+        df['body_pct'] = df['body'] / df['Open']
+        df['upper_shadow'] = df['High'] - np.maximum(df['Open'], df['Close'])
+        df['lower_shadow'] = np.minimum(df['Open'], df['Close']) - df['Low']
+        df['total_range'] = df['High'] - df['Low']
+        df['true_range'] = np.maximum(df['High'] - df['Low'],
+                                     np.maximum(abs(df['High'] - df['Close'].shift(1)),
+                                               abs(df['Low'] - df['Close'].shift(1))))
+        
+        return df
+    
+    def _add_trend_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add comprehensive trend indicators."""
+        # Simple Moving Averages (multiple periods)
+        periods = [3, 5, 8, 10, 13, 20, 21, 34, 50, 55, 89, 100, 144, 200, 233]
+        for period in periods:
+            df[f'sma_{period}'] = ta.trend.sma_indicator(df['Close'], window=period)
+            df[f'sma_{period}_ratio'] = df['Close'] / df[f'sma_{period}']
+        
+        # Exponential Moving Averages
+        for period in periods[:10]:  # Use shorter periods for EMA
+            df[f'ema_{period}'] = ta.trend.ema_indicator(df['Close'], window=period)
+            df[f'ema_{period}_ratio'] = df['Close'] / df[f'ema_{period}']
+        
+        # Moving Average Convergence Divergence
+        df['macd'] = ta.trend.macd(df['Close'])
+        df['macd_signal'] = ta.trend.macd_signal(df['Close'])
+        df['macd_histogram'] = ta.trend.macd_diff(df['Close'])
+        
+        # Average Directional Index
+        df['adx'] = ta.trend.adx(df['High'], df['Low'], df['Close'])
+        df['adx_pos'] = ta.trend.adx_pos(df['High'], df['Low'], df['Close'])
+        df['adx_neg'] = ta.trend.adx_neg(df['High'], df['Low'], df['Close'])
+        
+        # Parabolic SAR
+        df['psar'] = ta.trend.psar(df['High'], df['Low'], df['Close'])
+        df['psar_signal'] = np.where(df['Close'] > df['psar'], 1, -1)
+        
+        # Ichimoku
+        df['ichimoku_conv'] = ta.trend.ichimoku_conversion_line(df['High'], df['Low'])
+        df['ichimoku_base'] = ta.trend.ichimoku_base_line(df['High'], df['Low'])
+        df['ichimoku_a'] = ta.trend.ichimoku_a(df['High'], df['Low'])
+        df['ichimoku_b'] = ta.trend.ichimoku_b(df['High'], df['Low'])
+        
+        # Aroon
+        df['aroon_up'] = ta.trend.aroon_up(df['High'], df['Low'])
+        df['aroon_down'] = ta.trend.aroon_down(df['High'], df['Low'])
+        df['aroon_indicator'] = ta.trend.aroon_indicator(df['High'], df['Low'])
+        
+        return df
+    
+    def _add_momentum_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add momentum indicators."""
+        # RSI with multiple periods
+        periods = [6, 9, 14, 21, 25]
+        for period in periods:
+            df[f'rsi_{period}'] = ta.momentum.rsi(df['Close'], window=period)
+        
+        # Stochastic Oscillator
+        df['stoch_k'] = ta.momentum.stoch(df['High'], df['Low'], df['Close'])
+        df['stoch_d'] = ta.momentum.stoch_signal(df['High'], df['Low'], df['Close'])
+        df['stoch_rsi'] = ta.momentum.stochrsi(df['Close'])
+        df['stoch_rsi_k'] = ta.momentum.stochrsi_k(df['Close'])
+        df['stoch_rsi_d'] = ta.momentum.stochrsi_d(df['Close'])
+        
+        # Williams %R
+        df['williams_r'] = ta.momentum.williams_r(df['High'], df['Low'], df['Close'])
+        
+        # Rate of Change
+        periods = [1, 3, 5, 10, 20]
+        for period in periods:
+            df[f'roc_{period}'] = ta.momentum.roc(df['Close'], window=period)
+        
+        # Awesome Oscillator
+        df['awesome_osc'] = ta.momentum.awesome_oscillator(df['High'], df['Low'])
+        
+        # KAMA
+        df['kama'] = ta.momentum.kama(df['Close'])
+        
+        # TSI
+        df['tsi'] = ta.momentum.tsi(df['Close'])
+        
+        # Ultimate Oscillator
+        df['ultimate_osc'] = ta.momentum.ultimate_oscillator(df['High'], df['Low'], df['Close'])
+        
+        return df
+    
+    def _add_volatility_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add volatility indicators."""
+        # Bollinger Bands with multiple periods
+        periods = [10, 20, 50]
+        for period in periods:
+            df[f'bb_upper_{period}'] = ta.volatility.bollinger_hband(df['Close'], window=period)
+            df[f'bb_lower_{period}'] = ta.volatility.bollinger_lband(df['Close'], window=period)
+            df[f'bb_middle_{period}'] = ta.volatility.bollinger_mavg(df['Close'], window=period)
+            df[f'bb_width_{period}'] = df[f'bb_upper_{period}'] - df[f'bb_lower_{period}']
+            df[f'bb_position_{period}'] = (df['Close'] - df[f'bb_lower_{period}']) / df[f'bb_width_{period}']
+        
+        # Average True Range
+        periods = [14, 21, 50]
+        for period in periods:
+            df[f'atr_{period}'] = ta.volatility.average_true_range(df['High'], df['Low'], df['Close'], window=period)
+        
+        # Donchian Channels
+        periods = [10, 20, 55]
+        for period in periods:
+            df[f'donchian_high_{period}'] = ta.volatility.donchian_channel_hband(df['High'], df['Low'], df['Close'], window=period)
+            df[f'donchian_low_{period}'] = ta.volatility.donchian_channel_lband(df['High'], df['Low'], df['Close'], window=period)
+            df[f'donchian_middle_{period}'] = ta.volatility.donchian_channel_mband(df['High'], df['Low'], df['Close'], window=period)
+        
+        # Keltner Channels
+        df['keltner_upper'] = ta.volatility.keltner_channel_hband(df['High'], df['Low'], df['Close'])
+        df['keltner_lower'] = ta.volatility.keltner_channel_lband(df['High'], df['Low'], df['Close'])
+        df['keltner_middle'] = ta.volatility.keltner_channel_mband(df['High'], df['Low'], df['Close'])
+        
+        return df
+    
+    def _add_volume_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add volume indicators."""
+        # Volume SMA
+        periods = [10, 20, 50]
+        for period in periods:
+            df[f'volume_sma_{period}'] = ta.trend.sma_indicator(df['Volume'], window=period)
+            df[f'volume_ratio_{period}'] = df['Volume'] / df[f'volume_sma_{period}']
+        
+        # Volume indicators
+        df['vwap'] = ta.volume.volume_weighted_average_price(df['High'], df['Low'], df['Close'], df['Volume'])
+        df['mfi'] = ta.volume.money_flow_index(df['High'], df['Low'], df['Close'], df['Volume'])
+        df['ad'] = ta.volume.acc_dist_index(df['High'], df['Low'], df['Close'], df['Volume'])
+        df['obv'] = ta.volume.on_balance_volume(df['Close'], df['Volume'])
+        df['cmf'] = ta.volume.chaikin_money_flow(df['High'], df['Low'], df['Close'], df['Volume'])
+        df['fi'] = ta.volume.force_index(df['Close'], df['Volume'])
+        df['eom'] = ta.volume.ease_of_movement(df['High'], df['Low'], df['Volume'])
+        df['vpt'] = ta.volume.volume_price_trend(df['Close'], df['Volume'])
+        df['nvi'] = ta.volume.negative_volume_index(df['Close'], df['Volume'])
+        
+        # Price Volume Trend
+        df['pvt'] = ta.volume.volume_price_trend(df['Close'], df['Volume'])
+        
+        return df
+    
+    def create_extreme_dataset(self, symbols: List[str], years: int = 10) -> pd.DataFrame:
+        """Create extremely comprehensive dataset."""
+        logger.info(f"🔥 Creating EXTREME dataset for {len(symbols)} symbols ({years} years)")
+        
+        from .extreme_collector import ExtremeDataCollector
+        collector = ExtremeDataCollector()
+        
+        all_data = []
+        
+        for symbol in symbols:
+            logger.info(f"📊 Processing {symbol}...")
+            
+            # Get massive stock data
+            stock_data = collector.get_massive_stock_data(symbol, years)
+            
+            if not stock_data.empty:
+                # Add massive technical indicators
+                enhanced_data = self.add_massive_technical_indicators(stock_data)
+                
+                # Get fundamental data
+                fundamentals = collector.get_fundamental_data(symbol)
+                
+                # Get economic indicators
+                economic_data = collector.get_economic_indicators()
+                
+                # Get sector data
+                sector_data = collector.get_sector_etf_data(symbol)
+                
+                # Get news sentiment
+                news_data = collector.get_news_sentiment_data(symbol)
+                
+                # Combine all data sources
+                final_data = self._combine_all_data_sources(
+                    enhanced_data, fundamentals, economic_data, 
+                    sector_data, news_data, symbol
+                )
+                
+                if not final_data.empty:
+                    all_data.append(final_data)
+                    logger.info(f"✅ {symbol}: {len(final_data)} records with {len(final_data.columns)} features")
+        
+        if all_data:
+            combined_dataset = pd.concat(all_data, ignore_index=True)
+            logger.info(f"🎉 EXTREME dataset created: {len(combined_dataset)} records, {len(combined_dataset.columns)} features")
+            return combined_dataset
+        
+        return pd.DataFrame()

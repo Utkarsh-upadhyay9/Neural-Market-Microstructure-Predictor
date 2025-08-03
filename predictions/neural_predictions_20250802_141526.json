@@ -1,0 +1,56 @@
+{
+  "user": "Utkarsh-upadhyay9",
+  "timestamp": "2025-08-02T14:15:26.818396",
+  "results": [
+    {
+      "symbol": "AAPL",
+      "current_price": 202.3800048828125,
+      "predictions": {
+        "lstm": {
+          "predicted_price": 209.63623046875,
+          "change": 7.2562255859375,
+          "change_pct": 3.5854458992325817,
+          "direction": "UP"
+        },
+        "cnn": {
+          "predicted_price": 39890632704.0,
+          "change": 39890632501.619995,
+          "change_pct": 19710757752.33751,
+          "direction": "UP"
+        },
+        "ensemble": {
+          "predicted_price": 19945316456.818115,
+          "change": 19945316254.43811,
+          "change_pct": 9855378877.961477,
+          "direction": "UP"
+        }
+      },
+      "timestamp": "2025-08-02T14:15:26.089130"
+    },
+    {
+      "symbol": "GOOGL",
+      "current_price": 189.1300048828125,
+      "predictions": {
+        "lstm": {
+          "predicted_price": 184.1677703857422,
+          "change": -4.9622344970703125,
+          "change_pct": -2.6237161576477406,
+          "direction": "DOWN"
+        },
+        "cnn": {
+          "predicted_price": 33664954368.0,
+          "change": 33664954178.869995,
+          "change_pct": 17799901289.977367,
+          "direction": "UP"
+        },
+        "ensemble": {
+          "predicted_price": 16832477276.083885,
+          "change": 16832477086.95388,
+          "change_pct": 8899950643.676825,
+          "direction": "UP"
+        }
+      },
+      "timestamp": "2025-08-02T14:15:26.818026"
+    }
+  ]
+}
