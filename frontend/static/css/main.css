@@ -1,0 +1,163 @@
+
+/* Popular Indicators */
+.popular-indicator {
+    position: absolute;
+    top: 8px;
+    right: 35px;
+    background: #f59e0b;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.prediction-card.popular {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.prediction-card.popular::before {
+    background: #f59e0b;
+}
+
+/* Popular Button */
+.popular-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.popular-btn:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(217, 119, 6, 0.3);
+}
+
+/* Live Notifications */
+.live-notification {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* Enhanced live mode styling */
+.live-toggle.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.live-toggle.active .live-indicator {
+    background: white;
+    animation: ultraPulse 0.5s infinite;
+}
+
+@keyframes ultraPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.3); }
+}
+
+/* Status text for live updates */
+.status-text {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Enhanced prediction cards for indices */
+.prediction-card.index-etf {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #3b82f6;
+}
+
+.prediction-card.index-etf::before {
+    background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+}
+
+/* Loading state improvements */
+.loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    color: var(--neutral-600);
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--neutral-200);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+/* Enhanced error state */
+.error-card {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #fca5a5;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.error-message {
+    color: var(--danger);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .popular-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .live-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .popular-indicator {
+        right: 8px;
+        top: 6px;
+    }
+}
+
+/* Performance optimizations */
+.prediction-card {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.prediction-card:hover {
+    transform: translateY(-2px) translateZ(0);
+}
+
+/* Ultra-fast price flash animation */
+@keyframes priceFlash {
+    0% { background-color: var(--warning); transform: scale(1.05); }
+    100% { background-color: transparent; transform: scale(1); }
+}
