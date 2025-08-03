@@ -1,10 +1,16 @@
 # Docker Deployment
 
-
 ## Quick Start
 ```bash
 
 # Build and run
 docker-compose up --build
 
-# Access at http://localhost:8000
+#Or:
+# Build image
+docker build -t neural-market-predictor .
+
+# Run container
+docker run -p 8000:8000 neural-market-predictor
+
+# Access at http://localhost:800
