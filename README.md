@@ -87,5 +87,4 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Install CUDA dependencies (for GPU training)
-pip install tensorflow-gpu
+
