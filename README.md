@@ -12,7 +12,7 @@ This project implements a production-ready AI system that analyzes and predicts 
 - Automated data pipeline supporting multiple financial data providers
 - Real-time data ingestion from Alpha Vantage, Yahoo Finance, and IEX Cloud
 - Advanced preprocessing with 40+ technical indicators
-- Support for 26 major stocks with 5 years of historical data
+- Support for 26 major stocks with 5 years of historical data (more stocks can be easily added)
 - Robust data validation and error handling
 
 ### Neural Network Models
