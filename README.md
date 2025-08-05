@@ -1,6 +1,6 @@
 # Neural Market Microstructure Predictor
 
-A sophisticated deep learning system for predicting market microstructure patterns and high-frequency trading signals using advanced neural network architectures.
+A deep learning system for predicting market microstructure patterns and high-frequency trading signals using advanced neural network architectures.
 
 ## Overview
 
