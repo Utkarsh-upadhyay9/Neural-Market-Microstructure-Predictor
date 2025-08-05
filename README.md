@@ -20,7 +20,7 @@ This project implements a production-ready AI system that analyzes and predicts 
 - **CNN Models**: Efficient feature extraction for local pattern detection
 - **Attention Mechanisms**: State-of-the-art transformer-based models for variable-length sequences
 - **Ensemble Methods**: Combined model predictions for improved accuracy
-- **Heavy Model Architecture**: 1M+ parameters for complex pattern recognition
+- **Heavy Model Architecture**: 4.56M+ parameters for complex pattern recognition
 
 ### Training Infrastructure
 - GPU optimization specifically tuned for RTX series hardware
