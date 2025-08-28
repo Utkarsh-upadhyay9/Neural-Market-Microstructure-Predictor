@@ -1,1 +1,152 @@
-""" Fixed data preprocessing module with correct technical analysis library usage. """ import pandas as pd import numpy as np from typing import List, Tuple, Optional, Dict from sklearn.preprocessing import StandardScaler, MinMaxScaler import ta from loguru import logger class DataPreprocessor: """Preprocesses market data for machine learning models.""" def __init__(self, config: Dict = None): """Initialize the preprocessor with configuration.""" self.config = config or {} self.scaler = None self.feature_columns = [] def clean_data(self, data: pd.DataFrame) -> pd.DataFrame: """Clean the raw market data.""" try: df = data.copy() # Remove duplicates df = df.drop_duplicates() # Handle missing values df = df.fillna(method='ffill').fillna(method='bfill') # Remove outliers using IQR method numeric_columns = df.select_dtypes(include=[np.number]).columns for col in numeric_columns: Q1 = df[col].quantile(0.25) Q3 = df[col].quantile(0.75) IQR = Q3 - Q1 lower_bound = Q1 - 1.5 * IQR upper_bound = Q3 + 1.5 * IQR df[col] = df[col].clip(lower_bound, upper_bound) # Ensure proper data types if 'datetime' in df.columns: df['datetime'] = pd.to_datetime(df['datetime']) elif 'date' in df.columns: df['date'] = pd.to_datetime(df['date']) logger.info(f"Data cleaned: {len(df)} rows remaining") return df except Exception as e: logger.error(f"Error cleaning data: {e}") return data def add_technical_indicators(self, data: pd.DataFrame) -> pd.DataFrame: """Add technical indicators to the data with fixed library calls.""" try: df = data.copy() # Ensure we have the required columns required_columns = ['open', 'high', 'low', 'close', 'volume'] if not all(col in df.columns for col in required_columns): logger.error("Missing required columns for technical indicators") return df logger.info("Adding technical indicators...") # Moving averages (trend indicators) df['sma_5'] = ta.trend.sma_indicator(df['close'], window=5) df['sma_10'] = ta.trend.sma_indicator(df['close'], window=10) df['sma_20'] = ta.trend.sma_indicator(df['close'], window=20) df['sma_50'] = ta.trend.sma_indicator(df['close'], window=50) df['ema_5'] = ta.trend.ema_indicator(df['close'], window=5) df['ema_10'] = ta.trend.ema_indicator(df['close'], window=10) df['ema_20'] = ta.trend.ema_indicator(df['close'], window=20) # RSI (momentum indicator) df['rsi'] = ta.momentum.rsi(df['close'], window=14) # MACD (trend indicator) macd_line = ta.trend.macd(df['close']) macd_signal = ta.trend.macd_signal(df['close']) df['macd'] = macd_line df['macd_signal'] = macd_signal df['macd_histogram'] = macd_line - macd_signal # Bollinger Bands (volatility indicator) bb_high = ta.volatility.bollinger_hband(df['close']) bb_low = ta.volatility.bollinger_lband(df['close']) bb_mid = ta.volatility.bollinger_mavg(df['close']) df['bb_upper'] = bb_high df['bb_middle'] = bb_mid df['bb_lower'] = bb_low df['bb_width'] = bb_high - bb_low df['bb_position'] = (df['close'] - bb_low) / (bb_high - bb_low) # Stochastic Oscillator (momentum indicator) df['stoch_k'] = ta.momentum.stoch(df['high'], df['low'], df['close']) df['stoch_d'] = ta.momentum.stoch_signal(df['high'], df['low'], df['close']) # Average True Range (volatility indicator) df['atr'] = ta.volatility.average_true_range(df['high'], df['low'], df['close']) # Volume indicators (Fixed - using correct functions) df['volume_sma'] = ta.trend.sma_indicator(df['volume'], window=20) # Fixed: use trend.sma_indicator df['vwap'] = ta.volume.volume_weighted_average_price(df['high'], df['low'], df['close'], df['volume']) # Additional volume indicators df['mfi'] = ta.volume.money_flow_index(df['high'], df['low'], df['close'], df['volume']) df['ad'] = ta.volume.acc_dist_index(df['high'], df['low'], df['close'], df['volume']) df['obv'] = ta.volume.on_balance_volume(df['close'], df['volume']) # Price-based features df['high_low_pct'] = (df['high'] - df['low']) / df['close'] * 100 df['open_close_pct'] = (df['close'] - df['open']) / df['open'] * 100 # Volatility features df['returns'] = df['close'].pct_change() df['volatility'] = df['returns'].rolling(window=20).std() # Momentum features df['momentum'] = ta.momentum.roc(df['close'], window=10) df['williams_r'] = ta.momentum.williams_r(df['high'], df['low'], df['close']) # Trend features df['adx'] = ta.trend.adx(df['high'], df['low'], df['close']) df['cci'] = ta.trend.cci(df['high'], df['low'], df['close']) logger.info(f"Technical indicators added successfully. Total features: {len(df.columns)}") return df except Exception as e: logger.error(f"Error adding technical indicators: {e}") logger.info("Falling back to basic features...") # Fallback to basic features if technical indicators fail df['returns'] = df['close'].pct_change() df['high_low_ratio'] = df['high'] / df['low'] df['close_open_ratio'] = df['close'] / df['open'] df['volume_change'] = df['volume'].pct_change() return df def create_sequences(self, data: pd.DataFrame, sequence_length: int = 60, target_column: str = 'close') -> Tuple[np.ndarray, np.ndarray]: """Create sequences for time series prediction.""" try: # Select feature columns (exclude non-numeric and target) exclude_columns = ['datetime', 'date', 'symbol', target_column] feature_columns = [col for col in data.columns if col not in exclude_columns and data[col].dtype in ['float64', 'int64']] self.feature_columns = feature_columns # Prepare feature matrix features = data[feature_columns].values target = data[target_column].values # Create sequences X, y = [], [] for i in range(sequence_length, len(features)): X.append(features[i-sequence_length:i]) y.append(target[i]) X = np.array(X) y = np.array(y) logger.info(f"Created sequences: X shape {X.shape}, y shape {y.shape}") logger.info(f"Features used: {len(feature_columns)} - {feature_columns[:5]}..." if len(feature_columns) > 5 else f"Features: {feature_columns}") return X, y except Exception as e: logger.error(f"Error creating sequences: {e}") return np.array([]), np.array([]) def scale_features(self, X_train: np.ndarray, X_test: np.ndarray = None, scaler_type: str = 'standard') -> Tuple[np.ndarray, Optional[np.ndarray]]: """Scale features using specified scaler.""" try: if scaler_type == 'standard': self.scaler = StandardScaler() elif scaler_type == 'minmax': self.scaler = MinMaxScaler() else: logger.error(f"Unknown scaler type: {scaler_type}") return X_train, X_test # Reshape for scaling original_shape = X_train.shape X_train_reshaped = X_train.reshape(-1, X_train.shape[-1]) # Fit and transform training data X_train_scaled = self.scaler.fit_transform(X_train_reshaped) X_train_scaled = X_train_scaled.reshape(original_shape) X_test_scaled = None if X_test is not None: X_test_reshaped = X_test.reshape(-1, X_test.shape[-1]) X_test_scaled = self.scaler.transform(X_test_reshaped) X_test_scaled = X_test_scaled.reshape(X_test.shape) logger.info("Features scaled successfully") return X_train_scaled, X_test_scaled except Exception as e: logger.error(f"Error scaling features: {e}") return X_train, X_test def preprocess_pipeline(self, data: pd.DataFrame, sequence_length: int = 60, target_column: str = 'close', test_size: float = 0.2) -> Dict: """Complete preprocessing pipeline.""" try: # Step 1: Clean data cleaned_data = self.clean_data(data) # Step 2: Add technical indicators enhanced_data = self.add_technical_indicators(cleaned_data) # Step 3: Remove rows with NaN values enhanced_data = enhanced_data.dropna() if len(enhanced_data) < sequence_length + 50: # Need minimum data logger.error(f"Insufficient data after preprocessing: {len(enhanced_data)} rows") return {} # Step 4: Create sequences X, y = self.create_sequences(enhanced_data, sequence_length, target_column) if len(X) == 0: logger.error("No sequences created") return {} # Step 5: Train-test split split_idx = int(len(X) * (1 - test_size)) X_train, X_test = X[:split_idx], X[split_idx:] y_train, y_test = y[:split_idx], y[split_idx:] # Step 6: Scale features X_train_scaled, X_test_scaled = self.scale_features(X_train, X_test) result = { 'X_train': X_train_scaled, 'X_test': X_test_scaled, 'y_train': y_train, 'y_test': y_test, 'feature_columns': self.feature_columns, 'scaler': self.scaler, 'original_data': enhanced_data } logger.info("Preprocessing pipeline completed successfully") logger.info(f"Final feature count: {len(self.feature_columns)}") return result except Exception as e: logger.error(f"Error in preprocessing pipeline: {e}") return {}
+"""Data preprocessing utilities for market data."""
+
+import pandas as pd
+import numpy as np
+from typing import List, Tuple, Optional, Dict
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from loguru import logger
+
+try:
+	import ta
+except Exception:
+	ta = None
+
+
+class DataPreprocessor:
+	"""Preprocesses market data for machine learning models."""
+
+	def __init__(self, config: Dict = None):
+		self.config = config or {}
+		self.scaler = None
+		self.feature_columns: List[str] = []
+
+	def clean_data(self, data: pd.DataFrame) -> pd.DataFrame:
+		try:
+			df = data.copy()
+			df = df.drop_duplicates()
+			df = df.fillna(method='ffill').fillna(method='bfill')
+
+			numeric_columns = df.select_dtypes(include=[np.number]).columns
+			for col in numeric_columns:
+				Q1 = df[col].quantile(0.25)
+				Q3 = df[col].quantile(0.75)
+				IQR = Q3 - Q1
+				lower = Q1 - 1.5 * IQR
+				upper = Q3 + 1.5 * IQR
+				df[col] = df[col].clip(lower, upper)
+
+			if 'datetime' in df.columns:
+				df['datetime'] = pd.to_datetime(df['datetime'])
+			elif 'date' in df.columns:
+				df['date'] = pd.to_datetime(df['date'])
+
+			logger.info(f"Data cleaned: {len(df)} rows")
+			return df
+		except Exception as e:
+			logger.error(f"Error cleaning data: {e}")
+			return data
+
+	def add_technical_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
+		df = data.copy()
+		required = ['open', 'high', 'low', 'close', 'volume']
+		if not all(col in df.columns for col in required):
+			logger.warning("Missing required columns for technical indicators; skipping TA features")
+			return df
+
+		if ta is None:
+			logger.warning("`ta` library not available; skipping technical indicators")
+			return df
+
+		try:
+			df['sma_5'] = ta.trend.sma_indicator(df['close'], window=5)
+			df['ema_10'] = ta.trend.ema_indicator(df['close'], window=10)
+			df['rsi_14'] = ta.momentum.rsi(df['close'], window=14)
+			df['macd'] = ta.trend.macd(df['close'])
+			df['bb_upper'] = ta.volatility.bollinger_hband(df['close'])
+			df['bb_lower'] = ta.volatility.bollinger_lband(df['close'])
+			df['atr_14'] = ta.volatility.average_true_range(df['high'], df['low'], df['close'])
+			df['obv'] = ta.volume.on_balance_volume(df['close'], df['volume'])
+			logger.info("Technical indicators added")
+			return df
+		except Exception as e:
+			logger.error(f"Error computing technical indicators: {e}")
+			return df
+
+	def create_sequences(self, data: pd.DataFrame, sequence_length: int = 60, target_column: str = 'close') -> Tuple[np.ndarray, np.ndarray]:
+		try:
+			exclude = ['datetime', 'date', 'symbol', target_column]
+			feature_columns = [c for c in data.columns if c not in exclude and np.issubdtype(data[c].dtype, np.number)]
+			self.feature_columns = feature_columns
+
+			features = data[feature_columns].values
+			target = data[target_column].values
+
+			X, y = [], []
+			for i in range(sequence_length, len(features)):
+				X.append(features[i-sequence_length:i])
+				y.append(target[i])
+
+			X = np.array(X)
+			y = np.array(y)
+			logger.info(f"Created sequences: X={X.shape}, y={y.shape}")
+			return X, y
+		except Exception as e:
+			logger.error(f"Error creating sequences: {e}")
+			return np.array([]), np.array([])
+
+	def scale_features(self, X_train: np.ndarray, X_test: Optional[np.ndarray] = None, scaler_type: str = 'standard'):
+		try:
+			if scaler_type == 'standard':
+				self.scaler = StandardScaler()
+			else:
+				self.scaler = MinMaxScaler()
+
+			orig_shape = X_train.shape
+			Xr = X_train.reshape(-1, X_train.shape[-1])
+			Xs = self.scaler.fit_transform(Xr).reshape(orig_shape)
+
+			X_test_s = None
+			if X_test is not None:
+				tshape = X_test.shape
+				Xtr = X_test.reshape(-1, X_test.shape[-1])
+				X_test_s = self.scaler.transform(Xtr).reshape(tshape)
+
+			return Xs, X_test_s
+		except Exception as e:
+			logger.error(f"Error scaling features: {e}")
+			return X_train, X_test
+
+	def preprocess_pipeline(self, data: pd.DataFrame, sequence_length: int = 60, target_column: str = 'close', test_size: float = 0.2) -> Dict:
+		try:
+			cleaned = self.clean_data(data)
+			enhanced = self.add_technical_indicators(cleaned)
+			enhanced = enhanced.dropna()
+
+			if len(enhanced) < sequence_length + 10:
+				logger.error("Insufficient data after preprocessing")
+				return {}
+
+			X, y = self.create_sequences(enhanced, sequence_length, target_column)
+			if len(X) == 0:
+				return {}
+
+			split = int(len(X) * (1 - test_size))
+			X_train, X_test = X[:split], X[split:]
+			y_train, y_test = y[:split], y[split:]
+
+			X_train_s, X_test_s = self.scale_features(X_train, X_test)
+
+			result = {
+				'X_train': X_train_s,
+				'X_test': X_test_s,
+				'y_train': y_train,
+				'y_test': y_test,
+				'feature_columns': self.feature_columns,
+				'scaler': self.scaler,
+				'original_data': enhanced
+			}
+			logger.info("Preprocessing pipeline completed")
+			return result
+		except Exception as e:
+			logger.error(f"Error in preprocessing pipeline: {e}")
+			return {}
